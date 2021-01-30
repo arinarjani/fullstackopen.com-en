@@ -1,0 +1,8 @@
+# 0.6 chain of events for submitting a new note on 
+# https://studies.cs.helsinki.fi/exampleapp/spa
+
+browser->server: HTTP POST https://studies.cs.helsinki.fi/exampleapp/new_note
+
+note over browser:
+'make my diagram' is sent to the server
+end note
