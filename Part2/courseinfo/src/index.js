@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import Course from './components/Course.js'
 
-const App = () => {
-    const courses = [
+const App = (props) => {
+  const [notes, setNotes] = useState(props.notes);
+
+  const courses = [
     {
       name: 'Half Stack application development',
       id: 1,
