@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import ShowCountryData from './ShowCountryData.js';
 
 const ShowCountries = ( {filteredCountries} ) => {
-    console.log('ShowCountries.js - filteredCountries:', filteredCountries);
+    //console.log('ShowCountries.js - filteredCountries:', filteredCountries);
     const [ showCountryData, setShowCountryData ] = useState(false);
 
     const handleShowCountryData = () => {

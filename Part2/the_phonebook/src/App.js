@@ -13,7 +13,6 @@ const App = () => {
   const [ filter, setFilter ] = useState('');
   const [ countries, setCountries ] = useState([]);
   const [ country, setCountry ] = useState('');
-  // const [ searchResults, setSearchResults ] = useState([]);
 
   // 2.11: set the initial state of the application with useEffect and axios
   useEffect(() => {
@@ -113,24 +112,7 @@ const App = () => {
    */
   const handleFilterChange = (event) => {
     setFilter(event.target.value);
-
-    // I THINK I SEE THE PROBLEM, THIS SETSEARCHRESULTS() IS 1 STEP BEHIND
-    // EX. search 'la' -> works, but delete 'la', and you are left with '', and it shows 
-    // results for 'l' as that was the last search before '', then type 'l', and you will see
-    // results for '' and not 'l'
-    // setSearchResults(filterSearchResults());
   };
-
-
-
-  // const filterSearchResults = () => {
-  //   // look at each element in persons, and see if the newSearch is in 
-  //   // each person.name
-
-  //   return persons.filter(person => {
-  //       return person.name.toLowerCase().includes(newSearch)
-  //   });
-  // };
   
   const filteredPersons = filter ? persons.filter(person => person.name.toLowerCase().includes(filter.toLowerCase())) : []
   // 2.12 filter the countries data to show matches for the user search input
@@ -176,13 +158,16 @@ const App = () => {
                     - name, capital, population, language(s), flag
             2.13: 
       */}
-      {filteredCountries.length > 10
-        ? <p>There are too many matches, please specify another more specific filter.</p>
-        : filteredCountries.length === 1 
-          ? filteredCountries.map(data => (
-              <ShowCountryData country={data} />
-            ))
-          : <ShowCountries filteredCountries={filteredCountries} />
+      {
+        filteredCountries.length === 0
+          ? null
+          : filteredCountries.length === 1
+            ? filteredCountries.map(data => (
+                <ShowCountryData country={data} />
+              ))
+            : filteredCountries.length > 10 
+              ? <p>There are too many matches, please specify another more specific filter.</p>
+              : <ShowCountries filteredCountries={filteredCountries} />
       }
     </div>
   )
