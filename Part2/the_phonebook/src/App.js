@@ -3,8 +3,6 @@ import axios from 'axios';
 import PersonForm from './components/PersonForm.js';
 import Person from './components/Persons.js';
 import Filter from './components/Filter.js';
-import ShowCountryData from './components/ShowCountryData.js';
-import ShowCountries from './components/ShowCountries.js';
 import personServices from './services/person.js';
 import Notification from './components/Notification.js';
 
@@ -13,8 +11,6 @@ const App = () => {
   const [ newName, setNewName ] = useState('');
   const [ newNumber, setNewNumber ] = useState('');
   const [ filter, setFilter ] = useState('');
-  const [ countries, setCountries ] = useState([]);
-  const [ country, setCountry ] = useState('');
   const [ errorMessage, setErrorMessage ] = useState(null);
 
   // 2.11: set the initial state of the application with useEffect and axios
@@ -30,16 +26,7 @@ const App = () => {
         console.log(error);
       });
 
-      // grab countries
-      axios
-      .get('https://restcountries.eu/rest/v2/all')
-      .then(response => {
-        console.log('countries response successful');
-        setCountries(response.data)
-      }).catch(error => {
-        console.log('error with fetching persons data in App.js:36')
-        console.log(error);
-      });
+      
   }, []);
   
   // 2.6: allow the user to add a name to persons
@@ -95,16 +82,6 @@ const App = () => {
     }
   };
 
-  // 2.12: allow the user to search for a country
-  /**
-   * Handle input text changes for countries by user and set the
-   * correct state
-   *
-   * @param {Object} event The data input by the user
-   */
-  const handleCountryChange = (event) => {
-    setCountry(event.target.value);
-  }
 
   // 2.6: allow the user to add a name
   /**
@@ -170,9 +147,6 @@ const App = () => {
   
   const filteredPersons = filter ? persons.filter(person => person.name.toLowerCase().includes(filter.toLowerCase())) : [];
   
-  // 2.12 filter the countries data to show matches for the user search input
-  const filteredCountries = country ? countries.filter(data => data.name.toLowerCase().includes(country.toLowerCase())) : [];
-
   return (
     <div>
       <h2>Phonebook</h2>
@@ -204,31 +178,6 @@ const App = () => {
       {persons.map(person => (
         <Person name={person.name} number={person.number} removePerson={removePerson} id={person.id} />
       ))}
-      <h1>Countries</h1>
-      <Filter
-        filter={country}
-        handleFilterChange={handleCountryChange}
-        personal_label={'Enter a country name'}
-      />
-      {/* 
-        2.12 - 2.13
-            2.12: Filter the countries data to show matches for the user search input 
-                  Also only show searches < 10 in length
-                  If filteredCountries.length === 1, then show all that countries data
-                    - name, capital, population, language(s), flag
-            2.13: 
-      */}
-      {
-        filteredCountries.length === 0
-          ? null
-          : filteredCountries.length === 1
-            ? filteredCountries.map(data => (
-                <ShowCountryData country={data} />
-              ))
-            : filteredCountries.length > 10 
-              ? <p>There are too many matches, please specify another more specific filter.</p>
-              : <ShowCountries filteredCountries={filteredCountries} />
-      }
     </div>
   )
 };
