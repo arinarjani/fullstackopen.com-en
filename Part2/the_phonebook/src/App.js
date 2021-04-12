@@ -39,8 +39,7 @@ const App = () => {
     const isDuplicateName = persons.find(name => name.name.toLowerCase() === newName.toLowerCase()) || 'no duplicates';
     console.log('isDuplicateName:', isDuplicateName)
     if ( isDuplicateName === 'no duplicates' ) {
-      // create an object of the new person being added to the db
-      // for easy passing to functions
+      // object of the new person being added to the db
       const person = {
         name: newName,
         number: newNumber
@@ -58,13 +57,13 @@ const App = () => {
         })
         .catch(error => console.log(error));
       
-      // set newName and newNumber back to ''
       setNewName('');
       setNewNumber('');
     } else {
       // the name is a duplicate, so prompt the user to 
       // verify changing the number is what they want to do
       const result = window.confirm(`${newName} is already added to the phonebook, replace the old number with ${newNumber}?`);
+      
       if (result) {
         personServices
           .updatePerson({...isDuplicateName, number: newNumber})
@@ -76,7 +75,7 @@ const App = () => {
            })
            .catch(error => console.log(error));
       }
-      // set newName and newNumber back to ''
+
       setNewName('');
       setNewNumber('');
     }
@@ -132,6 +131,7 @@ const App = () => {
       // filtered array without the person's who has the id of the @param {id}
       const /** Array */ arrayWithRemovedPersons = persons.filter(person => person.id !== id);
 
+      // delete a person with ${id} from the db
       axios.delete(`http://localhost:3001/persons/${id}`)
         .catch(error => {
           console.log(error);
@@ -146,7 +146,7 @@ const App = () => {
   }
   
   const filteredPersons = filter ? persons.filter(person => person.name.toLowerCase().includes(filter.toLowerCase())) : [];
-  
+
   return (
     <div>
       <h2>Phonebook</h2>

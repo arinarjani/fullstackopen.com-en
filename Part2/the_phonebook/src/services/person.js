@@ -14,6 +14,12 @@ const createPerson = (person) => {
     return request.then(response => response.data);
 }
 
+/**
+ * Updates a person in the db according to their id
+ * 
+ * @param {person} A person with associated id in the db
+ * @returns {Promise} updated persons data
+ */
 const updatePerson = (person) => {
     const request = axios.put(`${baseURL}/${person.id}`, person);
     return request.then(response => response.data);
