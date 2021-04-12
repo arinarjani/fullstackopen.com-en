@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import PersonForm from './components/PersonForm.js';
-import Persons from './components/Persons.js';
+import Person from './components/Persons.js';
 import Filter from './components/Filter.js';
 import ShowCountryData from './components/ShowCountryData.js';
 import ShowCountries from './components/ShowCountries.js';
+import personServices from './services/person.js';
+import Notification from './components/Notification.js';
 
 const App = () => {
   const [ persons, setPersons ] = useState([]);
@@ -13,6 +15,7 @@ const App = () => {
   const [ filter, setFilter ] = useState('');
   const [ countries, setCountries ] = useState([]);
   const [ country, setCountry ] = useState('');
+  const [ errorMessage, setErrorMessage ] = useState(null);
 
   // 2.11: set the initial state of the application with useEffect and axios
   useEffect(() => {
@@ -26,12 +29,9 @@ const App = () => {
         console.log('error with fetching persons data in App.js:27')
         console.log(error);
       });
-  }, []);
 
-  
-  useEffect(() => {
-    // grab countries
-    axios
+      // grab countries
+      axios
       .get('https://restcountries.eu/rest/v2/all')
       .then(response => {
         console.log('countries response successful');
@@ -41,32 +41,57 @@ const App = () => {
         console.log(error);
       });
   }, []);
-
+  
   // 2.6: allow the user to add a name to persons
   const addNewName = (event) => {
     event.preventDefault();
 
     // 2.7: prevent the user from adding duplicate names to persons 
-
     // if this is [], then there is no duplicate names, but if it is [<data>]
     // then the name being added is a duplicate
-    const isDuplicateName = persons.filter(name => name.name.toLowerCase() === newName.toLowerCase());
-
-    if ( isDuplicateName.length === 0 ) {
-      // the name being added is not a duplicate
-      // add new name to the persons array
-      setPersons(persons.concat({
+    const isDuplicateName = persons.find(name => name.name.toLowerCase() === newName.toLowerCase()) || 'no duplicates';
+    console.log('isDuplicateName:', isDuplicateName)
+    if ( isDuplicateName === 'no duplicates' ) {
+      // create an object of the new person being added to the db
+      // for easy passing to functions
+      const person = {
         name: newName,
         number: newNumber
-      }));
+      };
+
+      // call f(x) to add person/number to db
+      personServices
+        .createPerson(person)
+        .then(newPerson => {
+          setPersons(persons.concat(newPerson));
+          setErrorMessage(`${person.name} ${person.number} has been added`);
+          setTimeout(() => {
+            setErrorMessage(null)
+          }, 5000);
+        })
+        .catch(error => console.log(error));
+      
       // set newName and newNumber back to ''
       setNewName('');
       setNewNumber('');
     } else {
-      // the name is a duplicate
-      alert(`${newName} has already been added. Please enter a new name`);
-      // set newName back to ''
+      // the name is a duplicate, so prompt the user to 
+      // verify changing the number is what they want to do
+      const result = window.confirm(`${newName} is already added to the phonebook, replace the old number with ${newNumber}?`);
+      if (result) {
+        personServices
+          .updatePerson({...isDuplicateName, number: newNumber})
+          .then(response => {
+            console.log('updated person:', response);
+            setPersons(persons.map(person => {
+              return person.name.toLowerCase() !== newName.toLowerCase() ? person : response
+            }))
+           })
+           .catch(error => console.log(error));
+      }
+      // set newName and newNumber back to ''
       setNewName('');
+      setNewNumber('');
     }
   };
 
@@ -113,10 +138,40 @@ const App = () => {
   const handleFilterChange = (event) => {
     setFilter(event.target.value);
   };
+
+  /**
+   * 2.17: Handles the deletion of a person by using their id
+   *
+   * @param {Number} the id of the person to be deleted
+   */
+  const removePerson = (id) => {
+    // find the person who's id matches the id in persons state
+    const /** Object */ personToRemove = persons.find(person => person.id === id);
+
+    // true if clicked 'ok', false if clicked 'cancel'
+    const /** Bool */ result = window.confirm(`Do you want to remove '${personToRemove.name}'?`);
+
+    if( result ) {
+      // filtered array without the person's who has the id of the @param {id}
+      const /** Array */ arrayWithRemovedPersons = persons.filter(person => person.id !== id);
+
+      axios.delete(`http://localhost:3001/persons/${id}`)
+        .catch(error => {
+          console.log(error);
+          setErrorMessage(`${personToRemove.name} ${personToRemove.number} has already been deleted`);
+          setTimeout(() => {
+            setErrorMessage(null)
+          }, 5000);
+        });
+      
+      setPersons(arrayWithRemovedPersons);
+    }
+  }
   
-  const filteredPersons = filter ? persons.filter(person => person.name.toLowerCase().includes(filter.toLowerCase())) : []
+  const filteredPersons = filter ? persons.filter(person => person.name.toLowerCase().includes(filter.toLowerCase())) : [];
+  
   // 2.12 filter the countries data to show matches for the user search input
-  const filteredCountries = country ? countries.filter(data => data.name.toLowerCase().includes(country.toLowerCase())) : []
+  const filteredCountries = country ? countries.filter(data => data.name.toLowerCase().includes(country.toLowerCase())) : [];
 
   return (
     <div>
@@ -131,9 +186,12 @@ const App = () => {
       {/* https://stackoverflow.com/questions/55600870/hooks-setstate-always-one-step-behind */}
       {/* search: 'why is my state 1 step behind reactjs' */}
       {/* show persons filtered */}
-      <Persons persons={filteredPersons} />
+      {filteredPersons.map(person => (
+        <Person name={person.name} number={person.number} />
+      ))}
       {/* 2.6: adding names to the phonebook with a form */}
-      <h2>Add a New</h2>
+      <h1>Add a New</h1>
+      <Notification message={errorMessage} />
       <PersonForm
         addNewName={addNewName}
         newName={newName}
@@ -141,10 +199,12 @@ const App = () => {
         newNumber={newNumber}
         handleNumberChange={handleNumberChange}
       />
-      <h2>Numbers</h2>
+      <h1>Numbers</h1>
       {/* show all persons not filtered */}
-      <Persons persons={persons} />
-      <h2>Countries</h2>
+      {persons.map(person => (
+        <Person name={person.name} number={person.number} removePerson={removePerson} id={person.id} />
+      ))}
+      <h1>Countries</h1>
       <Filter
         filter={country}
         handleFilterChange={handleCountryChange}
