@@ -1,0 +1,33 @@
+DELETE http://localhost:3001/api/persons/1
+
+###
+
+POST http://localhost:3001/api/persons HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Eric Sparrow",
+    "number": "12-34-5678901"
+}
+
+###
+
+POST http://localhost:3001/api/persons HTTP/1.1
+content-type: application/json
+
+{
+    "number": "12-34-5678901"
+}
+
+###
+
+POST http://localhost:3001/api/persons HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Eric Sparrow"
+}
+
+###
+
+GET http://localhost:3001/api/persons
