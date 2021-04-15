@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // url for the server with all the persons data
-const /** string */ baseURL = 'http://localhost:3001/persons';
+const /** string */ baseURL = '/api/persons';
 
 /**
  * Adds a person and associated number to the db

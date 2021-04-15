@@ -17,12 +17,12 @@ const App = () => {
   useEffect(() => {
     // grab persons
     axios
-      .get('http://localhost:3001/persons')
+      .get('/api/persons')
       .then(response => {
         console.log('persons response successful');
         setPersons(response.data);
       }).catch(error => {
-        console.log('error with fetching persons data in App.js:27')
+        console.log('error with fetching persons data in App.js:25')
         console.log(error);
       });
 
@@ -132,7 +132,7 @@ const App = () => {
       const /** Array */ arrayWithRemovedPersons = persons.filter(person => person.id !== id);
 
       // delete a person with ${id} from the db
-      axios.delete(`http://localhost:3001/persons/${id}`)
+      axios.delete(`/persons/${id}`)
         .catch(error => {
           console.log(error);
           setErrorMessage(`${personToRemove.name} ${personToRemove.number} has already been deleted`);

@@ -1,8 +1,11 @@
 const express = require('express');
 const morgan = require('morgan');
+const cors = require('cors');
 const app = express();
 
 app.use(express.json());
+app.use(cors());
+app.use(express.static('build'));
 
 /** 3.8 - only shows on POST requests */
 morgan.token('body', function (req, res) { return JSON.stringify(req.body) })
@@ -108,6 +111,8 @@ app.post('/api/persons', (req, res) => {
     res.json(person);
 });
 
-app.listen(3001, () => {
-    console.log('server started on port 3001');
+const PORT = process.env.PORT || 3001;
+
+app.listen(PORT, () => {
+    console.log(`server started on port ${PORT}`);
 });

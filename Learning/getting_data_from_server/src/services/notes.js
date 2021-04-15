@@ -1,5 +1,5 @@
 import axios from 'axios';
-const baseURL = 'http://localhost:3001/notes';
+const baseURL = '/api/notes';
 
 /**
  * Gets all the notes from the baseURL

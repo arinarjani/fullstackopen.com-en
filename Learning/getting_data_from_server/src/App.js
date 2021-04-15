@@ -12,15 +12,15 @@ const App = (props) => {
    * Gets all the notes from the server: http://localhost:3001/notes
    */
   const hook = () => {
-    console.log('effect')
+    console.log('effect');
     noteServices
       .getAll()
       .then(initalNotes => {
         console.log('promise fulfilled');
-        setNotes(initalNotes)
+        setNotes(initalNotes);
       })
-      .catch(error => console.log(error))
-  }
+      .catch(error => console.log(error));
+  };
   
   useEffect(hook, [])
 
