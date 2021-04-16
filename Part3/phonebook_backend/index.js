@@ -1,6 +1,9 @@
+require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
+const Person = require('./models/person.js');
+
 const app = express();
 
 app.use(express.json());
@@ -13,36 +16,38 @@ morgan.token('body', function (req, res) { return JSON.stringify(req.body) })
 /** 3.7- morgan('tiny'), 3.8 - 'tiny' + :body */
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
-let persons = [
-    { 
-      "name": "Arto Hellas", 
-      "number": "040-123456",
-      "id": 1
-    },
-    { 
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523",
-      "id": 2
-    },
-    { 
-      "name": "Dan Abramov", 
-      "number": "12-43-234345",
-      "id": 3
-    },
-    { 
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122",
-      "id": 4
-    }
-];
+// let persons = [
+//     { 
+//       "name": "Arto Hellas", 
+//       "number": "040-123456",
+//       "id": 1
+//     },
+//     { 
+//       "name": "Ada Lovelace", 
+//       "number": "39-44-5323523",
+//       "id": 2
+//     },
+//     { 
+//       "name": "Dan Abramov", 
+//       "number": "12-43-234345",
+//       "id": 3
+//     },
+//     { 
+//       "name": "Mary Poppendieck", 
+//       "number": "39-23-6423122",
+//       "id": 4
+//     }
+// ];
 
 app.get('/', (req, res) => {
     res.send('the server is working');
 });
 
-/** 3.1 */
+/** 3.1, 3.13 */
 app.get('/api/persons', (req, res) => {
-    res.json(persons);
+    Person.find({}).then(people => {
+        res.json(people);
+    })
 });
 
 /** 3.2 */
@@ -74,9 +79,8 @@ app.delete('/api/persons/:id', (req, res) => {
     res.status(204).end();
 });
 
-/** 3.5 */
+/** 3.5, 3.14 */
 app.post('/api/persons', (req, res) => {
-    console.log('hit the post route');
     const body = req.body;
 
     if (!body.name) {
@@ -90,28 +94,18 @@ app.post('/api/persons', (req, res) => {
             error: 'No number was given to the person'
         })
     }
-    
-    const duplicatePerson = persons.find(person => person.name.toLowerCase() === body.name.toLowerCase());
-    console.log('duplicate person', duplicatePerson);
-
-    if (duplicatePerson) {
-        return res.status(404).json({
-            error: 'This person is already in the database. Please enter a unique name.'
-        })
-    }
 
     const person = {
-        id: Math.floor(Math.random() * 100) + 1,
         name: body.name,
         number: body.number
     };
 
-    persons = persons.concat(person);
-
-    res.json(person);
+    Person.create(person).then(savedPerson => {
+        res.json(savedPerson);
+    })
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT;
 
 app.listen(PORT, () => {
     console.log(`server started on port ${PORT}`);
