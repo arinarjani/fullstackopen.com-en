@@ -4,9 +4,10 @@ const cors = require('cors');
 const app = express();
 const Note = require('./models/note');
 
+app.use(express.static('build'));
 app.use(express.json());
 app.use(cors());
-app.use(express.static('build'));
+
 
 const requestLogger = (request, response, next) => {
   console.log('Method:', request.method)
@@ -28,17 +29,42 @@ app.get('/api/notes', (req, res) => {
     })
 });
 
-app.get('/api/notes/:id', (req, res) => {
-  Note.findById(req.params.id).then(foundNote => {
-    res.json(foundNote);
-  });
+app.get('/api/notes/:id', (req, res, next) => {
+  Note.findById(req.params.id)
+      .then(foundNote => {
+        if (foundNote) {
+          res.json(foundNote);
+        } else {
+          res.status(404).end();
+        }
+        
+      })
+      .catch(error => next(error));
 });
 
-app.delete('/api/notes/:id', (req, res) => {
-  // const id = Number(req.params.id);
-  // notes = notes.filter(note => note.id !== id);
-  // console.log('notes is now', notes);
-  // res.status(204).end()
+app.delete('/api/notes/:id', (req, res, next) => {
+  Note.findByIdAndRemove(req.params.id).then(result => {
+    res.status(204).end()
+  }).catch(error => {
+    next(error)
+  })
+});
+
+app.put('/api/notes/:id', (req, res, next) => {
+  const body = req.body;
+
+  const note = {
+    content: body.content,
+    important: body.important
+  }
+
+  Note.findByIdAndUpdate(req.params.id, note, { new: true })
+       .then(updatedNote => {
+         res.json(updatedNote);
+       })
+       .catch(error => {
+         next(error);
+       })
 });
 
 app.post('/api/notes', (req, res) => {
@@ -65,7 +91,19 @@ const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint' })
 }
 
-app.use(unknownEndpoint)
+app.use(unknownEndpoint);
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message);
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' });
+  } 
+
+  next(error);
+};
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT;
 
