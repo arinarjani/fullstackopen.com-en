@@ -28,58 +28,87 @@ const App = () => {
 
       
   }, []);
-  
-  // 2.6: allow the user to add a name to persons
+
+  /** 3.20 */
   const addNewName = (event) => {
     event.preventDefault();
 
-    // 2.7: prevent the user from adding duplicate names to persons 
-    // if this is [], then there is no duplicate names, but if it is [<data>]
-    // then the name being added is a duplicate
-    const isDuplicateName = persons.find(name => name.name.toLowerCase() === newName.toLowerCase()) || 'no duplicates';
-    console.log('isDuplicateName:', isDuplicateName)
-    if ( isDuplicateName === 'no duplicates' ) {
-      // object of the new person being added to the db
-      const person = {
-        name: newName,
-        number: newNumber
-      };
+    const person = {
+      name: newName,
+      number: newNumber
+    };
 
-      // call f(x) to add person/number to db
-      personServices
-        .createPerson(person)
-        .then(newPerson => {
-          setPersons(persons.concat(newPerson));
-          setErrorMessage(`${person.name} ${person.number} has been added`);
-          setTimeout(() => {
-            setErrorMessage(null)
-          }, 5000);
-        })
-        .catch(error => console.log(error));
-      
-      setNewName('');
-      setNewNumber('');
-    } else {
-      // the name is a duplicate, so prompt the user to 
-      // verify changing the number is what they want to do
-      const result = window.confirm(`${newName} is already added to the phonebook, replace the old number with ${newNumber}?`);
-      
-      if (result) {
-        personServices
-          .updatePerson({...isDuplicateName, number: newNumber})
-          .then(response => {
-            console.log('updated person:', response);
-            setPersons(persons.map(person => {
-              return person.name.toLowerCase() !== newName.toLowerCase() ? person : response
-            }))
-           })
-           .catch(error => console.log(error));
-      }
+    personServices
+      .createPerson(person)
+      .then(newPerson => {
+        setPersons(persons.concat(newPerson));
+        setErrorMessage(`${person.name} ${person.number} has been added`);
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000);
+      })
+      .catch(error => {
+        setErrorMessage(error.response.data.error);
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000);
+      });
 
-      setNewName('');
-      setNewNumber('');
-    }
-  };
+    setNewName('');
+    setNewNumber('');
+  }
+
+  // // 2.6: allow the user to add a name to persons
+  // const addNewName = (event) => {
+  //   event.preventDefault();
+
+  //   // 2.7: prevent the user from adding duplicate names to persons 
+  //   // if this is [], then there is no duplicate names, but if it is [<data>]
+  //   // then the name being added is a duplicate
+  //   const isDuplicateName = persons.find(name => name.name.toLowerCase() === newName.toLowerCase()) || 'no duplicates';
+  //   console.log('isDuplicateName:', isDuplicateName)
+  //   if ( isDuplicateName === 'no duplicates' ) {
+  //     // object of the new person being added to the db
+  //     const person = {
+  //       name: newName,
+  //       number: newNumber
+  //     };
+
+  //     // call f(x) to add person/number to db
+  //     personServices
+  //       .createPerson(person)
+  //       .then(newPerson => {
+  //         setPersons(persons.concat(newPerson));
+  //         setErrorMessage(`${person.name} ${person.number} has been added`);
+  //         setTimeout(() => {
+  //           setErrorMessage(null)
+  //         }, 5000);
+  //       })
+  //       .catch(error => console.log(error));
+      
+  //     setNewName('');
+  //     setNewNumber('');
+  //   } else {
+  //     // the name is a duplicate, so prompt the user to 
+  //     // verify changing the number is what they want to do
+  //     const result = window.confirm(`${newName} is already added to the phonebook, replace the old number with ${newNumber}?`);
+      
+  //     if (result) {
+  //       personServices
+  //         .updatePerson({...isDuplicateName, number: newNumber})
+  //         .then(response => {
+  //           console.log('updated person:', response);
+  //           setPersons(persons.map(person => {
+  //             return person.name.toLowerCase() !== newName.toLowerCase() ? person : response
+  //           }))
+  //          })
+  //          .catch(error => console.log(error));
+  //     }
+
+  //     setNewName('');
+  //     setNewNumber('');
+  //   }
+  // };
 
 
   // 2.6: allow the user to add a name
@@ -122,20 +151,20 @@ const App = () => {
    */
   const removePerson = (id) => {
     // find the person who's id matches the id in persons state
-    const /** Object */ personToRemove = persons.find(person => person.id === id);
+    const /** Object */ personToRemove = persons.find(person => person._id === id);
 
     // true if clicked 'ok', false if clicked 'cancel'
     const /** Bool */ result = window.confirm(`Do you want to remove '${personToRemove.name}'?`);
 
     if( result ) {
       // filtered array without the person's who has the id of the @param {id}
-      const /** Array */ arrayWithRemovedPersons = persons.filter(person => person.id !== id);
+      const /** Array */ arrayWithRemovedPersons = persons.filter(person => person._id !== id);
 
       // delete a person with ${id} from the db
-      axios.delete(`/persons/${id}`)
+      axios.delete(`api/persons/${id}`)
         .catch(error => {
           console.log(error);
-          setErrorMessage(`${personToRemove.name} ${personToRemove.number} has already been deleted`);
+          setErrorMessage(`${personToRemove.name} ${personToRemove.number} has been deleted`);
           setTimeout(() => {
             setErrorMessage(null)
           }, 5000);
@@ -176,7 +205,7 @@ const App = () => {
       <h1>Numbers</h1>
       {/* show all persons not filtered */}
       {persons.map(person => (
-        <Person name={person.name} number={person.number} removePerson={removePerson} id={person.id} />
+        <Person name={person.name} number={person.number} removePerson={removePerson} id={person._id} />
       ))}
     </div>
   )

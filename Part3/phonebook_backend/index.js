@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
+// const axios = require('axios'); // use for app.post('/api/persons'...) on line 72
 const Person = require('./models/person.js');
 
 const app = express();
@@ -11,157 +12,154 @@ app.use(cors());
 app.use(express.static('build'));
 
 /** 3.8 - only shows on POST requests */
-morgan.token('body', function (req, res) { return JSON.stringify(req.body) })
+// I think I need res due to Express, so I'll ignore this error for now.
+morgan.token('body', (req, res) => { JSON.stringify(req.body); });
 
 /** 3.7- morgan('tiny'), 3.8 - 'tiny' + :body */
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
-
-// let persons = [
-//     { 
-//       "name": "Arto Hellas", 
-//       "number": "040-123456",
-//       "id": 1
-//     },
-//     { 
-//       "name": "Ada Lovelace", 
-//       "number": "39-44-5323523",
-//       "id": 2
-//     },
-//     { 
-//       "name": "Dan Abramov", 
-//       "number": "12-43-234345",
-//       "id": 3
-//     },
-//     { 
-//       "name": "Mary Poppendieck", 
-//       "number": "39-23-6423122",
-//       "id": 4
-//     }
-// ];
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
 
 app.get('/', (req, res) => {
-    res.send('the server is working');
+  res.send('the server is working');
 });
 
 /** 3.1, 3.13 */
 app.get('/api/persons', (req, res) => {
-    Person.find({}).then(people => {
-        res.json(people);
-    })
+  Person.find({}).then((people) => {
+    res.json(people);
+  });
 });
 
 /** 3.2 */
 app.get('/info', (req, res, next) => {
-    Person.find({})
-          .then(allPeople => {
-            res.send(`<p>Phonebook has info for ${allPeople.length} people</p> <p>${new Date()}</p>`);
-          })
-          .catch(error => next(error))
+  Person.find({})
+    .then((allPeople) => {
+      res.send(`<p>Phonebook has info for ${allPeople.length} people</p> <p>${new Date()}</p>`);
+    })
+    .catch((error) => next(error));
 });
 
 /** 3.3, 3.18 */
 app.get('/api/persons/:id', (req, res) => {
-    // const id = Number(req.params.id);
-    // const person = persons.find(person => person.id === id);
-    // console.log('person', person)
-
-    // if (person) {
-    //     res.json(person)
-    // } else {
-    //     res.status(404).json({
-    //         error: `no person with that id: ${id}`
-    //     })
-    // }
-
-    Person.findById(req.params.id)
-          .then(foundPerson => {
-              if (foundPerson) {
-                  res.json(foundPerson);
-              } else {
-                  res.status(404).end();
-              }
-          })
-          .catch(error => {
-              console.log(`no person with that id: ${req.params.id}`)
-          })
+  Person.findById(req.params.id)
+    .then((foundPerson) => {
+      if (foundPerson) {
+        res.json(foundPerson);
+      } else {
+        res.status(404).end();
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+      console.log(`no person with that id: ${req.params.id}`);
+    });
 });
 
 /** 3.4, 3.15 */
 app.delete('/api/persons/:id', (req, res, next) => {
-    // console.log('hit the delete route');
-    // const id = Number(req.params.id);
-    // persons = persons.filter(person => person.id !== id);
-    // console.log(persons);
-    // res.status(204).end();
-
-    Person.findByIdAndDelete(req.params.id)
-          .then(deletedPerson => {
-              res.status(204).end();
-          })
-          .catch(error => {
-              next(error);
-          })
-});
-
-/** 3.5, 3.14, 3.17 */
-app.post('/api/persons', (req, res) => {
-    const body = req.body;
-
-    if (!body.name) {
-        return res.status(404).json({
-            error: 'No name was given to the person'
-        })
-    } 
-    
-    if (!body.number) {
-        return res.status(404).json({
-            error: 'No number was given to the person'
-        })
-    }
-
-    const person = {
-        name: body.name,
-        number: body.number
-    };
-
-    Person.create(person).then(savedPerson => {
-        res.json(savedPerson);
+  Person.findByIdAndDelete(req.params.id)
+    .then((deletedPerson) => {
+      console.log(`${deletedPerson} was deleted successfully`);
+      res.status(204).end();
     })
+    .catch((error) => {
+      next(error);
+    });
 });
 
-/** 3.17 */
+/** 3.5, 3.14, 3.17 (lines: 123 - 140), 3.19 (lines: 142 - 149) */
+// not sure what to return from this function to get rid of the error.
+// Why this function wants a return statement, when others don't?
+app.post('/api/persons', (req, res, next) => {
+  // destructuring did not work to get this error away -> undefined
+  const body = req.body;
+
+  if (!body.name) {
+    return res.status(404).json({
+      error: 'No name was given to the person',
+    });
+  }
+
+  if (!body.number) {
+    return res.status(404).json({
+      error: 'No number was given to the person',
+    });
+  }
+
+  // 3.17 and 3.19 seem to want similar things, but 3.19 seems
+  // add onto 3.17, so I took out this code. It might still be
+  // needed if I misinterpreted the instruction, so I'll leave it
+  // for now.
+  // Person.find({ name: body.name })
+  //       .then(foundPerson => {
+  //           if (foundPerson.length > 0) {
+  //               axios.put(`http://localhost:3001/api/persons/${foundPerson[0].id}`,
+  //                         { name: body.name, number: body.number })
+  //                    .then(response => console.log('update successful'))
+  //                    .catch(error => console.log(error));
+  //           } else {
+  //             const person = {
+  //                 name: body.name,
+  //                 number: body.number
+  //             };
+
+  //             Person.create(person).then(savedPerson => {
+  //                 res.json(savedPerson);
+  //             });
+  //           }
+  //       })
+
+  const person = {
+    name: body.name,
+    number: body.number,
+  };
+
+  Person.create(person)
+    .then((savedPerson) => {
+      res.json(savedPerson);
+    })
+    .catch((error) => next(error));
+});
+
+/** 3.17, 3.20 (update validators) */
 app.put('/api/persons/:id', (req, res, next) => {
-    const body = req.body;
+  const { body } = req.body;
 
-    const person = {
-        name: body.name,
-        number: body.number
-    }
+  const person = {
+    name: body.name,
+    number: body.number,
+  };
 
-    Person.findByIdAndUpdate(req.params.id, person, { new: true })
-          .then(updatedPerson => {
-              res.json(updatedPerson);
-          })
-          .catch(error => {
-              next(error);
-          })
+  Person.findByIdAndUpdate(req.params.id, person, { runValidators: true, context: 'query', new: true })
+    .then((updatedPerson) => {
+      res.json(updatedPerson);
+    })
+    .catch((error) => {
+      next(error);
+    });
 });
 
 /** 3.16 */
+// not sure what to return from this function to get rid of the error.
+// Why this function wants a return statement, when others don't?
 const handleError = (error, req, res, next) => {
-    console.log(error.message);
+  console.log('Error.message:', error.message);
 
-    if (error.name === 'CastError') {
-        return res.status(400).send({ error: 'malformatted id' });
-    }
-    
-    next(error);
-}
+  if (error.name === 'CastError') {
+    return res.status(400).send({ error: 'malformatted id' });
+  }
+
+  if (error.name === 'ValidationError') {
+    return res.status(400).json({ error: error.message });
+  }
+
+  next(error);
+};
 
 app.use(handleError);
 
+// destructuring did not work to get this error away -> undefined
 const PORT = process.env.PORT;
 
 app.listen(PORT, () => {
-    console.log(`server started on port ${PORT}`);
+  console.log(`server started on port ${PORT}`);
 });

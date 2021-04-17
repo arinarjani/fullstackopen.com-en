@@ -4,8 +4,8 @@ POST http://localhost:3001/api/persons HTTP/1.1
 content-type: application/json
 
 {
-    "name": "Infernus",
-    "number": "12-34-5678901"
+    "name": "PC",
+    "number": "12"
 }
 
 ###
@@ -40,10 +40,10 @@ DELETE http://localhost:3001/api/persons/607a55b5f5f8990134df571f
 
 ###
 
-PUT http://localhost:3001/api/persons/6079c9291d40a925b856192c HTTP/1.1
+PUT http://localhost:3001/api/persons/6079f0b7c972bb30b076da5f HTTP/1.1
 content-type: application/json
 
 {
-    "name": "BF Injection",
-    "number": "55-55-1234567"
+    "name": "Sabre Turbo",
+    "number": "55-66-1234567"
 }
