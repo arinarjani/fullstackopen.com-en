@@ -73,18 +73,6 @@ app.post('/api/persons', (req, res, next) => {
   // destructuring did not work to get this error away -> undefined
   const body = req.body;
 
-  if (!body.name) {
-    return res.status(404).json({
-      error: 'No name was given to the person',
-    });
-  }
-
-  if (!body.number) {
-    return res.status(404).json({
-      error: 'No number was given to the person',
-    });
-  }
-
   // 3.17 and 3.19 seem to want similar things, but 3.19 seems
   // add onto 3.17, so I took out this code. It might still be
   // needed if I misinterpreted the instruction, so I'll leave it
