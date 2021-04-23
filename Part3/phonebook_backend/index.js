@@ -39,7 +39,7 @@ app.get('/info', (req, res, next) => {
 });
 
 /** 3.3, 3.18 */
-app.get('/api/persons/:id', (req, res) => {
+app.get('/api/persons/:id', (req, res, next) => {
   Person.findById(req.params.id)
     .then((foundPerson) => {
       if (foundPerson) {
@@ -51,6 +51,7 @@ app.get('/api/persons/:id', (req, res) => {
     .catch((error) => {
       console.log(error);
       console.log(`no person with that id: ${req.params.id}`);
+      next(error)
     });
 });
 
@@ -72,6 +73,25 @@ app.delete('/api/persons/:id', (req, res, next) => {
 app.post('/api/persons', (req, res, next) => {
   // destructuring did not work to get this error away -> undefined
   const body = req.body;
+
+  // Mongoose-uique-validator does the checking now, so no need for this.
+  // if (!body.name && !body.number) {
+  //   return res.status(404).json({
+  //     error: 'No name or number was given. Please provide a name and a number.',
+  //   });
+  // }
+
+  // if (!body.name) {
+  //   return res.status(404).json({
+  //     error: 'No name was given. Please provide a name.',
+  //   });
+  // }
+
+  // if (!body.number) {
+  //   return res.status(404).json({
+  //     error: 'No number was given. Please provide a number.',
+  //   });
+  // }
 
   // 3.17 and 3.19 seem to want similar things, but 3.19 seems
   // add onto 3.17, so I took out this code. It might still be
