@@ -14,13 +14,53 @@ POST http://localhost:3003/api/blogs HTTP/1.1
 content-type: application/json
 
 {
-  "title": "Did I separate the files correctly?",
-  "author": "Lance Vance",
+  "title": "Faggio",
+  "author": "Rockstar",
   "url": "https://www.fullstackopen.com.en",
   "likes": 100000000
 }
 
 ###
 
+POST http://localhost:3003/api/blogs HTTP/1.1
+content-type: application/json
+
+{
+  "title": "Sentinel XS",
+  "author": "Rockstar",
+  "url": "https://www.fullstackopen.com.en"
+}
+
+###
+
+POST http://localhost:3003/api/blogs HTTP/1.1
+content-type: application/json
+
+{
+  "author": "Rockstar"
+}
+
+###
+
 GET http://localhost:3003/api/blogs
+
+###
+
+GET http://localhost:3003/api/blogs/60821fda45272436bc3c6258
+
+###
+
+PUT http://localhost:3003/api/blogs/60821fda45272436bc3c6258 HTTP/1.1
+content-type: application/json
+
+{
+  "title": "PCJ 600",
+  "author": "Tommy Vercetti",
+  "url": "https://www.fullstackopen.com.en",
+  "likes": 50
+}
+
+###
+
+DELETE http://localhost:3003/api/blogs/60874745b27f69322cf955b3
 
