@@ -1,9 +1,10 @@
 POST http://localhost:3003/api/blogs HTTP/1.1
 content-type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFyaW4iLCJpZCI6IjYxYTJjZDljZGNhMDlkMDI3ZGFjMTZhNiIsImlhdCI6MTYzODM5NTM5OCwiZXhwIjoxNjM4NjU0NTk4fQ.thQN3HG_y6ue_6vUrBnDKOrA-IXluLq7gQCTgyC2F5M
 
 {
-  "title": "First Blog Mang!!!!!",
-  "author": "Tommy Vercetti",
+  "title": "tokenExtractor for the winn!!!!!",
+  "author": "arin",
   "url": "https://www.fullstackopen.com.en",
   "likes": 50
 }
@@ -62,5 +63,5 @@ content-type: application/json
 
 ###
 
-DELETE http://localhost:3003/api/blogs/60874745b27f69322cf955b3
-
+DELETE http://localhost:3003/api/blogs/61a7f569f82ace636262d731
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFyaW4iLCJpZCI6IjYxYTJjZDljZGNhMDlkMDI3ZGFjMTZhNiIsImlhdCI6MTYzODM5NjcxMiwiZXhwIjoxNjM4NjU1OTEyfQ.dlGjXzdhlpcqo3BukhvTn4OBLp-xXwiHTyGTrDQSZRc

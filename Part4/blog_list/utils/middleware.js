@@ -24,8 +24,22 @@ const errorHandler = (error, request, response, next) => {
   next(error);
 };
 
+// 4.20*: bloglist expansion, step8 -> create a middleware to grab the token from 
+//        the Authorization header on Request
+const tokenExtractor = (request, response, next) => {
+    // grab the token from the header
+    const { authorization } = request.headers
+  
+    if (authorization && authorization.toLowerCase().includes('bearer')) {
+      request.token = authorization.slice(7);
+    }
+
+  next()
+}
+
 module.exports = {
   requestLogger,
   unknownEndpoint,
   errorHandler,
+  tokenExtractor,
 };
