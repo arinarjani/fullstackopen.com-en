@@ -1,6 +1,14 @@
-const User = require('../models/author.js')
+const Author = require('../models/author.js')
 const usersRouter = require('express').Router();
 const bcrypt = require('bcrypt');
+
+usersRouter.get('/', async (request, response) => {
+    const authorsInDb = await Author.count({});
+    console.log('authorsInDb', authorsInDb);
+    response.json({
+        authors: authorsInDb
+    });
+});
 
 // 4.15: bloglist expansion, step3
 // create a user with a username and a password
@@ -14,7 +22,7 @@ usersRouter.post('/', async (request, response) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // create a user and store it in the db, also save the user to respond at the end
-    const savedUser = await User.create({
+    const savedUser = await Author.create({
         username,
         name,
         passwordHash: hashedPassword

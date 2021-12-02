@@ -10,7 +10,6 @@ loginRouter.post('/', async (request, response) => {
 
     // find the author with the provided username
     const user = await Author.findOne({ username });
-    console.log('found user:', user);
 
     // if user is not found, return error
     if (!user) {
@@ -19,7 +18,6 @@ loginRouter.post('/', async (request, response) => {
 
     // verify the password matches the one in the db
     const passwordCorrect = await bcrypt.compare(password, user.passwordHash);
-    console.log('correct password?', passwordCorrect);
 
     // if password is incorrect, return error
     if (!passwordCorrect) {

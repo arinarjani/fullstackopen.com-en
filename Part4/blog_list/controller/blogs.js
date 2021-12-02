@@ -46,10 +46,17 @@ blogsRouter.post('/', async (request, response) => {
   const token = request.token;
 
   // decode the token using jwt.verify(token, secretKey)
-  const decodedToken = await jwt.verify(token, process.env.SECRET)
+  // const decodedToken = await jwt.verify(token, process.env.SECRET) ORIGNAL
+  let decodedToken = '';
+  let decodedTokenError = '';
+  try {
+    decodedToken = await jwt.verify(token, process.env.SECRET)
+  } catch(err) {
+    decodedTokenError = err;
+  }
 
   // if no authorization or bad token, return 401
-  if (!(authorization || decodedToken)) {
+  if (!(authorization || decodedToken) || decodedTokenError) {
     return response.status(401).json({ error: 'invalid or missing token' })
   }
 
@@ -61,7 +68,7 @@ blogsRouter.post('/', async (request, response) => {
   }
 
   // find the user who created this blog
-  const user = await Author.findOne({ id: decodedToken.id })
+  const user = await Author.findById( decodedToken.id )
 
   const newBlog = await Blog.create({
     title,

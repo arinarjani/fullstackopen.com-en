@@ -7,7 +7,7 @@ const cors = require('cors');
 const blogsRouter = require('./controller/blogs.js');
 const usersRouter = require('./controller/user.js');
 const loginRouter = require('./controller/login.js');
-const { tokenExtractor } = require('./utils/middleware')
+const { tokenExtractor, userExtractor } = require('./utils/middleware')
 const mongoose = require('mongoose');
 
 logger.info('connecting to', config.MONGODB_URI);
@@ -31,6 +31,7 @@ app.use(express.json());
 
 // use middleware
 app.use(tokenExtractor)
+app.use(userExtractor)
 
 // localhost:{PORT}/api/blogs/<path>
 app.use('/api/blogs', blogsRouter);
