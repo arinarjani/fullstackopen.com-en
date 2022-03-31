@@ -5,6 +5,8 @@ const config = require('./utils/config.js');
 
 const server = http.createServer(app);
 
+console.log('connected to server in react front-end')
+
 server.listen(config.PORT, () => {
   logger.info(`Server running on port ${config.PORT}`)
 })
