@@ -24,12 +24,24 @@ function App( { note }) {
   }, []);
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.loggedNoteAppUser);
+    let user;
 
-    if (user) {
+    try {
+      user = JSON.parse(localStorage.loggedNoteAppUser);
+
       setUser(user);
-      noteService.setToken(user.token) 
+      noteService.setToken(user.token)
+    } catch (error) {
+      console.log('there is no user data saved in local storage')
     }
+
+    // OLD CODE THAT GAVE ME AN ERROR BECAUSE JSON.PARSE WILL THROW AN ERROR TO EMPTY STRINGS AND INVALID JSON
+    // const user = JSON.parse(localStorage.loggedNoteAppUser)
+
+    // if (user) {
+    //   setUser(user);
+    //   noteService.setToken(user.token) 
+    // }
   }, [])
 
   // add a new note via input on app

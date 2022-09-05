@@ -3,11 +3,14 @@ const usersRouter = require('express').Router();
 const bcrypt = require('bcrypt');
 
 usersRouter.get('/', async (request, response) => {
-    const authorsInDb = await Author.count({});
-    console.log('authorsInDb', authorsInDb);
-    response.json({
-        authors: authorsInDb
-    });
+    // const authorsInDb = await Author.count({});
+    // console.log('authorsInDb', authorsInDb);
+    // response.json({
+    //     authors: authorsInDb
+    // });
+
+    const authors = await Author.find({}).populate('blogs');
+    response.json(authors)
 });
 
 // 4.15: bloglist expansion, step3
