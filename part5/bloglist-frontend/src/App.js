@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import Login from './components/Login'
+import Logout from './components/Logout'
 import loginService from './services/login'
 import blogService from './services/blogs'
 
@@ -35,7 +36,10 @@ const App = () => {
     // )  
   }, [])
 
+
+  // 5.2 - make the login permanent
   useEffect(() => {
+    // FIRST ATTEMPT
     // const user = JSON.parse(localStorage.loggedinBlogUser) || null;
 
     // if (user) {
@@ -45,6 +49,7 @@ const App = () => {
 
    
 
+    // SECOND ATTEMPT
     // let unmounted = false;
     // const userFromLocalStorage = JSON.parse(localStorage.loggedinBlogUser)
 
@@ -64,6 +69,15 @@ const App = () => {
     // return () => {
     //   unmounted = true;
     // }
+
+    // THIRD ATTEMPT
+    try {
+      const user = JSON.parse(localStorage.loggedinBlogUser);
+      setUser(user);
+      blogService.setToken(user.token) 
+    } catch (err) {
+      console.log(err)
+    }
   }, [])
 
   const handleLogin = async (event) => {
@@ -77,9 +91,19 @@ const App = () => {
       console.log(user)
     } catch (error) {
       console.log(error)
+      console.log(error.code)
     }
   }
 
+  // 5.2 - create a way to logout
+  const handleLogout = () => {
+    // set the user back to null
+    setUser(null)
+    // erase local storage
+    localStorage.clear();
+  }
+
+  // 5.1 make it so the user can login and only show the login form if the user is not logged in
   return (
     <div>
       {user === null
@@ -98,6 +122,7 @@ const App = () => {
             {blogs.map(blog =>
               <Blog key={blog.id} blog={blog} />
             )}
+            <Logout handleLogout={handleLogout} />
           </>
       }
     </div>
