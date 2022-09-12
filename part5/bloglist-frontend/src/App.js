@@ -2,10 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import Login from './components/Login'
 import Logout from './components/Logout'
-<<<<<<< HEAD
 import AddBlog from './components/AddBlog'
-=======
->>>>>>> 52855bb09e4a1eeeab55c545f55630c25783f85d
 import loginService from './services/login'
 import blogService from './services/blogs'
 
@@ -53,7 +50,7 @@ const App = () => {
     // }
 
 
-    // SECOND ATTEMPT
+    // second attempt
     // let unmounted = false;
     // const userFromLocalStorage = JSON.parse(localStorage.loggedinBlogUser)
 
@@ -106,15 +103,22 @@ const App = () => {
     }
   }
 
-  // 5.2 - create a way to logout
+  // 5.2 - handle logout
+  // TODO: maybe redirect to the login page, but HOW? 
+  //       for now you have to refresh the page to login again
   const handleLogout = () => {
-    // set the user back to null
-    setUser(null)
-    // erase local storage
+    setUser(null);
     localStorage.clear();
   }
 
-  // 5.1 make it so the user can login and only show the login form if the user is not logged in
+  // 5.3 handle a way to add a new blog
+  const handleNewBlog = (e) => {
+    e.preventDefault();
+
+    // use blogServices to add a new blog
+    blogService.create(newBlog);
+  }
+
   return (
     <div>
       {user === null
