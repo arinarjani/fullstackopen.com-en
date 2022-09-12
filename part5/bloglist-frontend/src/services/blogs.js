@@ -6,6 +6,7 @@ let token = null;
 
 const setToken = (newToken) => {
   token = `bearer ${newToken}`;
+  console.log('token', token)
 }
 
 const getAll = () => {
@@ -23,6 +24,8 @@ const create = async (newObject) => {
   const config = {
     headers: {Authorization: token}
   }
+
+  console.log('config',config)
 
   const request = await axios.post(baseUrl, newObject, config);
 

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import Login from './components/Login'
+import Logout from './components/Logout'
+import AddBlog from './components/AddBlog'
 import loginService from './services/login'
 import blogService from './services/blogs'
 
@@ -9,6 +11,7 @@ const App = () => {
   const [user, setUser] = useState(null);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [newBlog, setNewBlog] = useState('');
 
   useEffect(() => {
     // const controller = new AbortController();
@@ -35,7 +38,17 @@ const App = () => {
     // )  
   }, [])
 
+  // 5.2 - make the login permanent with local storage
   useEffect(() => {
+    // third attempt
+    try {
+      setUser(JSON.parse(localStorage.loggedinBlogUser));
+      // blogService.setToken(user.token);
+    } catch (error) {
+      console.log(error)
+    }
+
+    // first attempt
     // const user = JSON.parse(localStorage.loggedinBlogUser) || null;
 
     // if (user) {
@@ -43,8 +56,8 @@ const App = () => {
     //   blogService.setToken(user.token) 
     // }
 
-   
 
+    // second attempt
     // let unmounted = false;
     // const userFromLocalStorage = JSON.parse(localStorage.loggedinBlogUser)
 
@@ -66,18 +79,41 @@ const App = () => {
     // }
   }, [])
 
+  // 5.1 - implement a way to login
   const handleLogin = async (event) => {
     event.preventDefault(); // stop page from refreshing
 
     try {
       const foundUser = await loginService(username, password)
 
-      setUser(foundUser.data)
+      // TODO: user is not being set for some reason!!!!!
+      //       - I tried await
+      //       - foundUser is working and showing a user just fine -> foundUser.data is the user
+      setUser(JSON.stringify(foundUser.data))
+      console.log('user', user)
       localStorage.setItem('loggedinBlogUser', JSON.stringify(foundUser.data))
-      console.log(user)
+      setUsername('');
+      setPassword('');
+      blogService.setToken(user.token);
     } catch (error) {
       console.log(error)
     }
+  }
+
+  // 5.2 - handle logout
+  // TODO: maybe redirect to the login page, but HOW? 
+  //       for now you have to refresh the page to login again
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.clear();
+  }
+
+  // 5.3 handle a way to add a new blog
+  const handleNewBlog = (e) => {
+    e.preventDefault();
+
+    // use blogServices to add a new blog
+    blogService.create(newBlog);
   }
 
   return (
@@ -98,6 +134,14 @@ const App = () => {
             {blogs.map(blog =>
               <Blog key={blog.id} blog={blog} />
             )}
+            <AddBlog 
+              handleNewBlog={handleNewBlog} 
+              newBlog={newBlog}
+              setNewBlog={setNewBlog}
+            />
+            <Logout
+              logOut={handleLogout}
+            />
           </>
       }
     </div>
