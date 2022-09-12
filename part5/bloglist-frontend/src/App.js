@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import Login from './components/Login'
 import Logout from './components/Logout'
+<<<<<<< HEAD
 import AddBlog from './components/AddBlog'
+=======
+>>>>>>> 52855bb09e4a1eeeab55c545f55630c25783f85d
 import loginService from './services/login'
 import blogService from './services/blogs'
 
@@ -38,6 +41,7 @@ const App = () => {
     // )  
   }, [])
 
+<<<<<<< HEAD
   // 5.2 - make the login permanent with local storage
   useEffect(() => {
     // third attempt
@@ -49,6 +53,12 @@ const App = () => {
     }
 
     // first attempt
+=======
+
+  // 5.2 - make the login permanent
+  useEffect(() => {
+    // FIRST ATTEMPT
+>>>>>>> 52855bb09e4a1eeeab55c545f55630c25783f85d
     // const user = JSON.parse(localStorage.loggedinBlogUser) || null;
 
     // if (user) {
@@ -57,7 +67,11 @@ const App = () => {
     // }
 
 
+<<<<<<< HEAD
     // second attempt
+=======
+    // SECOND ATTEMPT
+>>>>>>> 52855bb09e4a1eeeab55c545f55630c25783f85d
     // let unmounted = false;
     // const userFromLocalStorage = JSON.parse(localStorage.loggedinBlogUser)
 
@@ -77,6 +91,15 @@ const App = () => {
     // return () => {
     //   unmounted = true;
     // }
+
+    // THIRD ATTEMPT
+    try {
+      const user = JSON.parse(localStorage.loggedinBlogUser);
+      setUser(user);
+      blogService.setToken(user.token) 
+    } catch (err) {
+      console.log(err)
+    }
   }, [])
 
   // 5.1 - implement a way to login
@@ -97,9 +120,11 @@ const App = () => {
       blogService.setToken(user.token);
     } catch (error) {
       console.log(error)
+      console.log(error.code)
     }
   }
 
+<<<<<<< HEAD
   // 5.2 - handle logout
   // TODO: maybe redirect to the login page, but HOW? 
   //       for now you have to refresh the page to login again
@@ -116,6 +141,17 @@ const App = () => {
     blogService.create(newBlog);
   }
 
+=======
+  // 5.2 - create a way to logout
+  const handleLogout = () => {
+    // set the user back to null
+    setUser(null)
+    // erase local storage
+    localStorage.clear();
+  }
+
+  // 5.1 make it so the user can login and only show the login form if the user is not logged in
+>>>>>>> 52855bb09e4a1eeeab55c545f55630c25783f85d
   return (
     <div>
       {user === null
@@ -134,6 +170,7 @@ const App = () => {
             {blogs.map(blog =>
               <Blog key={blog.id} blog={blog} />
             )}
+<<<<<<< HEAD
             <AddBlog 
               handleNewBlog={handleNewBlog} 
               newBlog={newBlog}
@@ -142,6 +179,9 @@ const App = () => {
             <Logout
               logOut={handleLogout}
             />
+=======
+            <Logout handleLogout={handleLogout} />
+>>>>>>> 52855bb09e4a1eeeab55c545f55630c25783f85d
           </>
       }
     </div>
