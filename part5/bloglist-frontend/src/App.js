@@ -5,13 +5,16 @@ import Logout from './components/Logout'
 import AddBlog from './components/AddBlog'
 import loginService from './services/login'
 import blogService from './services/blogs'
+import Notification from './components/Notification'
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [user, setUser] = useState(null);
+  console.log('user', user)
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [newBlog, setNewBlog] = useState('');
+  const [newBlogTitle, setNewBlogTitle] = useState('');
+  const [notification, setNotification] = useState('');
 
   useEffect(() => {
     // const controller = new AbortController();
@@ -85,43 +88,66 @@ const App = () => {
   const handleLogin = async (event) => {
     event.preventDefault(); // stop page from refreshing
 
+    // TODO: figure out how to get the error object or something 
+    //       to then be able to show something like, 'incorrect usename' or 'incorrect password'
     try {
-      const foundUser = await loginService(username, password)
-
-      // TODO: user is not being set for some reason!!!!!
-      //       - I tried await
-      //       - foundUser is working and showing a user just fine -> foundUser.data is the user
-      setUser(JSON.stringify(foundUser.data))
-      console.log('user', user)
-      localStorage.setItem('loggedinBlogUser', JSON.stringify(foundUser.data))
+      const loginAttempt = await loginService(username, password);
+      console.log('loginAttempt:', loginAttempt);
+      const { data: foundUser } = await loginService(username, password);
+      console.log('got here')
+      setUser(foundUser)
+      localStorage.setItem('loggedinBlogUser', JSON.stringify(foundUser));
       setUsername('');
       setPassword('');
       blogService.setToken(user.token);
     } catch (error) {
-      console.log(error)
-      console.log(error.code)
+      console.log('error:', error)
+
+      // part 5.4 - creating a message system to show error in logging in or a success in adding a new blog
+      setNotification('wrong username or password...try again');
+      setTimeout(() => {
+        setNotification('');
+      }, 3000);
     }
   }
 
   // 5.2 - handle logout
-  // TODO: maybe redirect to the login page, but HOW? 
-  //       for now you have to refresh the page to login again
   const handleLogout = () => {
     setUser(null);
     localStorage.clear();
   }
 
   // 5.3 handle a way to add a new blog
-  const handleNewBlog = (e) => {
+  const handleNewBlogTitle = async (e) => {
     e.preventDefault();
 
+    const body = {
+      title: newBlogTitle,
+      author: user.username,
+    }
+
     // use blogServices to add a new blog
-    blogService.create(newBlog);
+    try {
+      const createdTitle = await blogService.create(body);
+      console.log('createdTitle:', createdTitle);
+
+      // part 5.4 - creating a message system to show error in logging in or a success in adding a new blog
+      setNotification(`a new blog titled '${body.title}' was created by '${body.author}'`);
+      setTimeout(() => {
+        setNotification('');
+      }, 3000)
+    } catch (err) {
+      console.log('error in creating new blog:', err);
+    }
+    // const createdTitle = await blogService.create(body);
+
+    // console.log('createdTitle:', createdTitle);
   }
 
   return (
     <div>
-      {user === null
+      <Notification notification={notification} />
+      {user === null || user === undefined
         ? 
           <Login 
             handleLogin={handleLogin} 
@@ -138,9 +164,9 @@ const App = () => {
               <Blog key={blog.id} blog={blog} />
             )}
             <AddBlog 
-              handleNewBlog={handleNewBlog} 
-              newBlog={newBlog}
-              setNewBlog={setNewBlog}
+              handleNewBlogTitle={handleNewBlogTitle} 
+              newBlogTitle={newBlogTitle}
+              setNewBlogTitle={setNewBlogTitle}
             />
             <Logout
               logOut={handleLogout}

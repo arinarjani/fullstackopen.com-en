@@ -6,7 +6,7 @@ let token = null;
 
 const setToken = (newToken) => {
   token = `bearer ${newToken}`;
-  console.log('token', token)
+  console.log('token:', token)
 }
 
 const getAll = () => {
@@ -25,7 +25,10 @@ const create = async (newObject) => {
     headers: {Authorization: token}
   }
 
-  console.log('config',config)
+  newObject.url = baseUrl
+
+  console.log('config in blog service', config)
+  console.log('newObject', JSON.stringify(newObject))
 
   const request = await axios.post(baseUrl, newObject, config);
 
