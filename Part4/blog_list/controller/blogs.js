@@ -39,11 +39,12 @@ blogsRouter.get('/:id', async (request, response) => {
 });
 
 blogsRouter.post('/', async (request, response) => {
+
   // grab the authorization from the header
   const { authorization } = request.headers;
 
   // token
-  const token = request.token;
+  const { token } = request;
 
   // decode the token using jwt.verify(token, secretKey)
   // const decodedToken = await jwt.verify(token, process.env.SECRET) ORIGNAL
@@ -55,13 +56,18 @@ blogsRouter.post('/', async (request, response) => {
     decodedTokenError = err;
   }
 
+  console.log('decoded token', decodedToken)
+
   // if no authorization or bad token, return 401
   if (!(authorization || decodedToken) || decodedTokenError) {
+    console.log('in this error...no authorization')
     return response.status(401).json({ error: 'invalid or missing token' })
   }
 
-  const { title, url, likes, author } = request.body;
+  const { title, url, author } = request.body;
+  let { likes } = request.body;
   if (title === undefined && url === undefined) {
+    console.log('in this error...stuff being undefined')
     response.status(404).end();
   } else if (likes === undefined) {
     likes = 0;

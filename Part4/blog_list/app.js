@@ -3,6 +3,7 @@ const logger = require('./utils/logger.js');
 const express = require('express');
 require('express-async-errors');
 const app = express();
+const bodyParser = require('body-parser')
 const cors = require('cors');
 const blogsRouter = require('./controller/blogs.js');
 const usersRouter = require('./controller/user.js');
@@ -32,6 +33,12 @@ app.use(express.json());
 // use middleware
 app.use(tokenExtractor)
 app.use(userExtractor)
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false })) // also got this from stackoverflow..saying bodyParser is not in Express by default
+
+// parse application/json
+app.use(bodyParser.json()) // not sure what this does, but if I comment it out, the app still works fine, I got this from stackoverflow
 
 // localhost:{PORT}/api/blogs/<path>
 app.use('/api/blogs', blogsRouter);
